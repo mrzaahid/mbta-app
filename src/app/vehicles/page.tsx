@@ -6,42 +6,52 @@ import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
 import { fetchVehiclesPages } from '@/app/lib/data';
 import Splitter from '../ui/vehicles/splitter';
+import FilterRoute from '../ui/vehicles/filterroute';
 
  
 export default async function Page(props: {
   searchParams?: Promise<{
     itemsperpage?: string;
     page?: string;
+    filterRoute?:string;
+    filterTrip?:string
   }>;
 }) {
   const searchParams = await props.searchParams;
   const itemsPerPage = Number(searchParams?.itemsperpage)||6;
   const currentPage = Number(searchParams?.page) || 1;
-  const infoData = await fetchVehiclesPages(itemsPerPage);
+  const filterRoute = searchParams?.filterRoute || 'Green-B';
+  const filterTrip = searchParams?.filterTrip || '';
+  // const infoData = await fetchFilteredVehicles(itemsPerPage,currentPage,filterRoute,filterTrip);
+  const infoData = await fetchVehiclesPages(itemsPerPage,currentPage,filterRoute,filterTrip);
+  const totalPages = infoData.totalPages;
+  const totalItems = infoData.totalItems;
   const startItem = (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(currentPage * itemsPerPage, infoData.totalItems);
+  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+  console.log('data',`${totalItems} ${totalPages} ${startItem} ${endItem}`);
   return (
     <div className="container mx-2 my-2">
       <div className="flex w-full items-center justify-between mb-2 mt-4">
         <h1 className={`${lusitana.className} text-2xl`}>Vehicles Table</h1>
-        <p>{`Current Page : ${currentPage} from ${infoData.totalPages} pages`}</p>
+        <p>{`Current Page : ${currentPage} from ${totalPages} pages`}</p>
         <p>{
-           `${startItem}-${endItem} from ${infoData.totalItems} Data `
+           `${startItem}-${endItem} from ${totalItems} Data `
           }
         </p>
       </div>
       <div className='flex flex-row-reverse my-3'>
           <Suspense>
+            {/* <FilterRoute /> */}
             <Splitter itemsPerPage={itemsPerPage}/>
           </Suspense>
       </div>
       <div>
           <Suspense key={currentPage} fallback={<InvoicesTableSkeleton />}>
-            <Table currentPage={currentPage} itemsPerPage={itemsPerPage}/>
+            <Table currentPage={currentPage} itemsPerPage={itemsPerPage} filterRoute={filterRoute} filterTrip={filterTrip}/>
           </Suspense>
       </div>
       <div className="mt-5 flex w-full justify-center">
-        <Pagination totalPages={infoData.totalPages} />
+        <Pagination totalPages={totalPages} />
       </div>
     </div>
   );

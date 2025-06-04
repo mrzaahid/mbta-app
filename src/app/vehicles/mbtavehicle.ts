@@ -45,5 +45,10 @@ export type mbtaVehicle = {
     self: string;
   };
   relationships: VehicleRelationships;
-  type: string;
+  type: 'vehicle';
 };
+
+export type mbtaVehicleResponse = {
+  data: mbtaVehicle[];
+  version : string
+}

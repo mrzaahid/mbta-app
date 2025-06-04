@@ -5,11 +5,15 @@ import Detail from '@/app/vehicles/detail';
 export default async function vehiclesTable({
   itemsPerPage,
   currentPage,
+  filterRoute,
+  filterTrip
 }: {
   itemsPerPage: number,
   currentPage: number;
+  filterRoute: string;
+  filterTrip: string;
 }) {
-  const vehicles = await fetchFilteredVehicles(itemsPerPage,currentPage)
+  const vehicles = await fetchFilteredVehicles(itemsPerPage,currentPage,filterRoute,filterTrip)
   // const [showPopup, setShowPopup] = useState(false);
 
   //    const togglePopup = () => {
