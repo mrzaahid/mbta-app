@@ -4,6 +4,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 firstly install depedency
 ```bash
 npm install
+#or
+pnpm isntall
 ```
 secondly, run the development server:
 
