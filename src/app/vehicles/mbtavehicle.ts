@@ -50,5 +50,17 @@ export type mbtaVehicle = {
 
 export type mbtaVehicleResponse = {
   data: mbtaVehicle[];
-  version : string
+  version : string;
+  links :{
+    first : string | null;
+    last : string | null;
+    next : string | null;
+    prev : string | null;
+  }
+}
+
+export type mbtaVehiclesPage = {
+  data: mbtaVehicle[];
+  totalPages: number;
+  totalItems: number
 }

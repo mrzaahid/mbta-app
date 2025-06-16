@@ -1,19 +1,22 @@
 import { fetchFilteredVehicles } from '@/app/lib/data';
 import VehiclesStatus from './status';
 import Detail from '@/app/vehicles/detail';
+import { mbtaVehicle } from '@/app/vehicles/mbtavehicle';
 
 export default async function vehiclesTable({
-  itemsPerPage,
-  currentPage,
-  filterRoute,
-  filterTrip
+  // itemsPerPage,
+  // currentPage,
+  // filterRoute,
+  // filterTrip
+  vehicles
 }: {
-  itemsPerPage: number,
-  currentPage: number;
-  filterRoute: string;
-  filterTrip: string;
+  // itemsPerPage: number,
+  // currentPage: number;
+  // filterRoute: string;
+  // filterTrip: string;
+  vehicles:mbtaVehicle[]
 }) {
-  const vehicles = await fetchFilteredVehicles(itemsPerPage,currentPage,filterRoute,filterTrip)
+  // const vehicles = await fetchFilteredVehicles(itemsPerPage,currentPage,filterRoute,filterTrip)
   // const [showPopup, setShowPopup] = useState(false);
 
   //    const togglePopup = () => {
