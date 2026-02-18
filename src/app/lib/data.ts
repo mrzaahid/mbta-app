@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { mbtaVehicle, mbtaVehicleResponse, mbtaVehiclesPage } from '@/app/vehicles/mbtavehicle';
 import { MBTARoute } from '../vehicles/mbtaroute';
-import { EXPORT_DETAIL } from 'next/dist/shared/lib/constants';
+import { MBTATrip } from '../vehicles/mbtatrip';
 
 
 const USER_TOKEN = process.env.API_KEY;
@@ -113,7 +113,7 @@ export async function fetchFilteredVehiclesManual(
       };
     }
 
-    throw new Error("Pagination links missing");
+    // throw new Error("Pagination links missing");
   } catch (error) {
     console.error('Fetch error:', error);
     throw new Error('Failed to fetch vehicles.');
@@ -256,22 +256,22 @@ export async function fetchRoutes(): Promise<MBTARoute[]>{
   }
 }
 
-// export async function fetchTrip(): Promise<MBTARoute[]>{
-//   try {
-//     const instance = axios.create({
-//     headers:{Authorization: AuthStr},
-//     baseURL: 'https://api-v3.mbta.com',
-//     timeout: 12000,
-//   });
-//     const data = await instance.get(`/routes`)
-//     const routes = data.data.data
-//     console.log('routes',routes.length);
-//     return routes;
-//   } catch (error) {
-//     console.error('Database Error:', error);
-//     throw new Error('Failed to fetch Routes.');
-//   }
-// }
+export async function fetchTrip(route: string,date: string): Promise<MBTATrip[]>{
+  try {
+    const instance = axios.create({
+    headers:{Authorization: AuthStr},
+    baseURL: 'https://api-v3.mbta.com',
+    timeout: 12000,
+  });
+    const data = await instance.get(`/trips?route=${route}&filter[date]=${date}`)
+    const routes = data.data.data
+    console.log('trips',routes.length);
+    return routes;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch Trips.');
+  }
+}
 
 // export async function fetchFilteredVehiclesPages(
 //   itemsPerPage:number,

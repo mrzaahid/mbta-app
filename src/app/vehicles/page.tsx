@@ -4,9 +4,9 @@ import Table from '@/app/ui/vehicles/table';
 import { lusitana } from '@/app/ui/fonts';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
-import { fetchFilteredVehiclesManual, fetchRoutes } from '@/app/lib/data';
+import { fetchFilteredVehiclesManual, fetchRoutes, fetchTrip } from '@/app/lib/data';
 import Splitter from '../ui/vehicles/splitter';
-import FilterRoute from '../ui/vehicles/filterroute';
+import { formatedDate } from '../lib/utils';
 import FilterRouteAndTrip from '../ui/vehicles/FilterRouteAndTrip';
 // import { useLocation } from 'react-router-dom';
 
@@ -16,28 +16,43 @@ export default async function Page(props: {
     itemsperpage?: string;
     page?: string;
     'filter[route]':string;
-    'filterTrip[trip]':string
+    'filter[trip]':string
   }>;
 }) {
-  const response = await fetchRoutes();
-  const routeOptions = response.map(route => ({
+  const routesresponse = await fetchRoutes();
+  const routeOptions = routesresponse.map(route => ({
           id: route.id,
           label: route.attributes.long_name
-        }));
+  }));
+  console.log('routes',routeOptions.length);
+  let tripOptions: { id: string, label: string }[] = [];
+  
   // const location = useLocation();
   const searchParams = await props.searchParams;
   const itemsPerPage = Number(searchParams?.itemsperpage)||6;
   const currentPage = Number(searchParams?.page) || 1;
   const filterRoute = decodeURIComponent(searchParams?.['filter[route]'] || '');
-  const filterTrip = searchParams?.['filterTrip[trip]'] || '';
+  const filterTrip = searchParams?.['filter[trip]'] || '';
   console.log('batu',`${filterRoute},${filterTrip}`);
   // const infoData = await fetchFilteredVehicles(itemsPerPage,currentPage,filterRoute,filterTrip);
   const infoData = await fetchFilteredVehiclesManual(itemsPerPage,currentPage,filterRoute,filterTrip);
-  const totalPages = infoData.totalPages;
-  const totalItems = infoData.totalItems;
+  const totalPages = infoData?.totalPages;
+  const totalItems = infoData?.totalItems;
   const startItem = (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+  const endItem = Math.min(currentPage * itemsPerPage, totalItems || 0);
   console.log('data',`${totalItems} ${totalPages} ${startItem} ${endItem}`);
+  const vehicles = infoData?.data || [];
+  console.log('vehicles',vehicles.length);
+  const noData = vehicles.length === 0;
+  const date = new Date()
+  const today = formatedDate(date);
+  if(filterRoute != "") {
+    const tripsresponse = await fetchTrip(filterRoute,today);
+    tripOptions = tripsresponse.map(trip => ({
+          id: trip.id,
+          label: trip.attributes.headsign+" "+trip.id
+    }));
+  }
   
   // console.log('p',response);
   return (
@@ -50,20 +65,25 @@ export default async function Page(props: {
           }
         </p>
       </div>
-      <div className='flex flex-row-reverse my-3'>
+      <div className='flex flex-row-reverse justify-between my-3'>
           <Suspense>
-            <FilterRouteAndTrip routeOptions={routeOptions}/>
+            <FilterRouteAndTrip routeOptions={routeOptions} tripOptions={tripOptions}/>
             <Splitter itemsPerPage={itemsPerPage}/>
           </Suspense>
       </div>
       <div>
-          <Suspense key={currentPage} fallback={<InvoicesTableSkeleton />}>
-            {/* <Table currentPage={currentPage} itemsPerPage={itemsPerPage} filterRoute={filterRoute} filterTrip={filterTrip}/> */}
-            <Table vehicles={infoData.data} />
-          </Suspense>
+        {noData ? (
+        <div className="container mx-auto p-4 bg-yellow-50 border border-yellow-200 rounded">
+          No vehicles found for Route: <strong>{filterRoute}</strong> and Trip: <strong>{filterTrip}</strong>.
+        </div>
+      ) : (
+        <Suspense key={`${currentPage}-${filterRoute}`} fallback={<InvoicesTableSkeleton />}>
+          <Table vehicles={vehicles} />
+        </Suspense>
+      )}
       </div>
       <div className="mt-5 flex w-full justify-center">
-        <Pagination totalPages={totalPages} />
+        <Pagination totalPages={totalPages||1} />
       </div>
     </div>
   );

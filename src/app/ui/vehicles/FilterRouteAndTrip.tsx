@@ -20,10 +20,10 @@ interface RouteOption {
 }
 
 
-export default function FilterRouteAndTrip({routeOptions}:{routeOptions : RouteOption[]}) {
-  const [valueRoute, setValueRoute] = React.useState<RouteOption[] | null>(null);
+export default function FilterRouteAndTrip({routeOptions,tripOptions}:{routeOptions : RouteOption[], tripOptions : RouteOption[]}) {
+  const [valueRoute, setValueRoute] = React.useState<RouteOption | null>(null);
   const [inputValueRoute, setInputValueRoute] = React.useState('');
-  const [valueTrip, setValueTrip] = React.useState<RouteOption[] | null>(null);
+  const [valueTrip, setValueTrip] = React.useState<RouteOption | null>(null);
   const [inputValueTrip, setInputValueTrip] = React.useState('');
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -48,92 +48,71 @@ export default function FilterRouteAndTrip({routeOptions}:{routeOptions : RouteO
           try {
             const params = new URLSearchParams(searchParams);
             if (term == null) {
-              params.delete('filter[route]');
+              params.delete('filter[trip]');
               replace(`${pathname}?${params}`);
             }else{
               console.log(`Searching... ${term}`);
-              params.set(`filter[route]`, term);
+              params.set(`filter[trip]`, term);
               replace(`${pathname}?${params}`);
             }
           } catch (error) {
             console.log(error);
           }
       }, 300);
+  const handleExport = () => {
+    // This function only runs when a user clicks the button 
+    // (which only happens in the browser), so document will be defined.
+    const csvContent = routeOptions.map(opt => `${opt.id},${opt.label}`).join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement("a"); // This is safe here
+    link.href = url;
+    link.download = "data.csv";
+    link.click();
+    
+  };
   return (
     <div>
-        <Autocomplete
-      multiple
-      id="checkboxes-tags-demo"
-      options={routeOptions}
-      disableCloseOnSelect
-      onChange={(_event: React.SyntheticEvent, newValue: RouteOption[] | null) => {
-          setValueRoute(newValue);
-          setInputValueRoute(newValue?.map((option) => option.id).join(', ')||'');
-          filterRouteInput(newValue?.map((option) => option.id).join(', '));
-        //   filterRouteInput(newValue?.map);
-          console.log(newValue?.toString());
-        }}
-      isOptionEqualToValue={(option, value) => option.id === value.id}
-      getOptionLabel={(option) => option.label}
-      renderOption={(props, option, { selected }) => {
-        const { key, ...optionProps } = props;
-        return (
-          <li key={key} {...optionProps}>
-            <Checkbox
-              icon={icon}
-              checkedIcon={checkedIcon}
-              style={{ marginRight: 8 }}
-              checked={selected}
-            />
-            {option.label}
-          </li>
-        );
-      }}
+    <Autocomplete
+      value={valueRoute} 
       style={{ width: 500 }}
+      onChange={(_event, newValue) => {
+        setValueRoute(newValue);
+        filterRouteInput(newValue ? newValue.id : null);
+      }}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
+      
+      options={routeOptions}
+      getOptionLabel={(option) => option.label || ""}
       renderInput={(params) => (
-        <TextField {...params} label="Checkboxes" placeholder="Favorites" />
+        <TextField {...params} label="Select Route" />
       )}
     />
-     {/* <Autocomplete
-      multiple
-      id="checkboxes-tags-demo"
-      options={routeOptions}
-      disableCloseOnSelect
-      onChange={(_event: React.SyntheticEvent, newValue: RouteOption[] | null) => {
-          setValueRoute(newValue);
-          setInputValueRoute(newValue?.map((option) => option.id).join(', ')||'');
-          filterRouteInput(newValue?.map((option) => option.id).join(', '));
-        //   filterRouteInput(newValue?.map);
-          console.log(newValue?.toString());
+    {valueRoute &&
+      <Autocomplete
+        value={valueTrip}
+        style={{ width: 500 }}
+        onChange={(_event, newValue) => {
+          setValueTrip(newValue);
+          filterTripInput(newValue ? newValue.id : null);
         }}
-      isOptionEqualToValue={(option, value) => option.id === value.id}
-      getOptionLabel={(option) => option.label}
-      renderOption={(props, option, { selected }) => {
-        const { key, ...optionProps } = props;
-        return (
-          <li key={key} {...optionProps}>
-            <Checkbox
-              icon={icon}
-              checkedIcon={checkedIcon}
-              style={{ marginRight: 8 }}
-              checked={selected}
-            />
-            {option.label}
-          </li>
-        );
-      }}
-      style={{ width: 500 }}
-      renderInput={(params) => (
-        <TextField {...params} label="Checkboxes" placeholder="Favorites" />
-      )}
-    /> */}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+        
+        options={tripOptions}
+        getOptionLabel={(option) => option.label || ""}
+        renderInput={(params) => (
+          <TextField {...params} label="Select Trip" />
+        )}
+      />
+    }
     <div>
       {inputValueRoute}
     </div>
     <div>
-        {valueRoute?.map((option) => option.id).join(', ')}
+        {valueRoute?.id}
     </div>
-      
+      {inputValueTrip}
     </div>
   );
 }

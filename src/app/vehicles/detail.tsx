@@ -1,11 +1,11 @@
-   'use client'
-   import React, { useState } from 'react';
-   import { mbtaVehicle } from './mbtavehicle';
+'use client'
+import React, { useState } from 'react';
+import { mbtaVehicle } from './mbtavehicle';
 import Maps from '../ui/vehicles/maps';
 import { DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
    interface DetailProps {
     vehicleData: mbtaVehicle;  // Explicitly declare vehicleData as a prop
-    }
+   }
 
    export default function Detail({ vehicleData }: DetailProps ) {
      const [showPopup, setShowPopup] = useState(false);

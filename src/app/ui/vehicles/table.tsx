@@ -1,4 +1,3 @@
-import { fetchFilteredVehicles } from '@/app/lib/data';
 import VehiclesStatus from './status';
 import Detail from '@/app/vehicles/detail';
 import { mbtaVehicle } from '@/app/vehicles/mbtavehicle';

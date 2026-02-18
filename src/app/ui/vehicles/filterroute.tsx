@@ -33,16 +33,17 @@ export default function FilterRoute({routeOptions}:{routeOptions : RouteOption[]
               params.set(`filter[route]`, term.toString());
               replace(`${pathname}?${params}`);
             }
-              
-                  
-              
           } catch (error) {
             console.log(error);
           }
       }, 300);
+
+
+  
   return (
     <div>
-      <Autocomplete
+      <div><Autocomplete
+        multiple={false}
         value={value}
         onChange={(_event: React.SyntheticEvent, newValue: RouteOption | null) => {
           setValue(newValue);
@@ -57,7 +58,7 @@ export default function FilterRoute({routeOptions}:{routeOptions : RouteOption[]
         id="route-filter-autocomplete"
         options={routeOptions}
         isOptionEqualToValue={(option, value) => option.id === value.id}
-        sx={{ width: 300 }}
+        sx={{ width: 200 }}
         renderInput={(params) => (
           <TextField 
             {...params} 
@@ -65,7 +66,8 @@ export default function FilterRoute({routeOptions}:{routeOptions : RouteOption[]
             variant="outlined"
           />
         )}
-      />
+      /></div>
+      
     </div>
   );
 }

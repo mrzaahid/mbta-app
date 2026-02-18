@@ -9,7 +9,7 @@ export default function Splitter({itemsPerPage}:{itemsPerPage : number}){
     const searchParams = useSearchParams();
     const { replace } = useRouter();
     const [showPopup, setShowPopup] = useState(false);
-    const itemparams = Number(searchParams.get('itemsperpage'));
+    const itemparams = Number(searchParams.get('itemsperpage'))||6;
     // setShowPopup(false)
     const handleChange = useDebouncedCallback((term) => {
         try {
@@ -47,7 +47,11 @@ export default function Splitter({itemsPerPage}:{itemsPerPage : number}){
                 <label className="sr-only"> Quantity </label>
 
                 <div className="flex items-center rounded-sm border border-gray-200">
-                    <button type="button" className="size-10 leading-10 text-gray-600 transition hover:opacity-75">
+                    <button type="button" className="size-10 leading-10 text-gray-600 transition hover:opacity-75"
+                        onClick={ ()=>
+                            handleChange(itemparams-1)
+                        }
+                    >
                     &minus;
                     </button>
 
@@ -64,7 +68,11 @@ export default function Splitter({itemsPerPage}:{itemsPerPage : number}){
                     className="h-10 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
                     />
 
-                    <button type="button" className="size-10 leading-10 text-gray-600 transition hover:opacity-75">
+                    <button type="button" className="size-10 leading-10 text-gray-600 transition hover:opacity-75"
+                        onClick={ ()=>
+                            handleChange(itemparams+1)
+                        }
+                    >
                     +
                     </button>
                 </div>
