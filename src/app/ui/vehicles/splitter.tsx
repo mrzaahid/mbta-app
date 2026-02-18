@@ -1,6 +1,5 @@
 'use client';
 
-import { Console } from 'console';
 import { usePathname,useSearchParams,useRouter  } from 'next/navigation';
 import { useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
