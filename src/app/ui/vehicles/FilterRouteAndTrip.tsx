@@ -2,17 +2,11 @@
 import * as React from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import Checkbox from '@mui/material/Checkbox';
-import { useRef } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { usePathname,useSearchParams,useRouter  } from 'next/navigation';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { coba } from '@/app/lib/data';
 
-
-const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
-const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 interface RouteOption {
   id: string;
@@ -22,9 +16,7 @@ interface RouteOption {
 
 export default function FilterRouteAndTrip({routeOptions,tripOptions}:{routeOptions : RouteOption[], tripOptions : RouteOption[]}) {
   const [valueRoute, setValueRoute] = React.useState<RouteOption | null>(null);
-  const [inputValueRoute, setInputValueRoute] = React.useState('');
   const [valueTrip, setValueTrip] = React.useState<RouteOption | null>(null);
-  const [inputValueTrip, setInputValueTrip] = React.useState('');
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { replace } = useRouter();
@@ -59,19 +51,6 @@ export default function FilterRouteAndTrip({routeOptions,tripOptions}:{routeOpti
             console.log(error);
           }
       }, 300);
-  const handleExport = () => {
-    // This function only runs when a user clicks the button 
-    // (which only happens in the browser), so document will be defined.
-    const csvContent = routeOptions.map(opt => `${opt.id},${opt.label}`).join("\n");
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    
-    const link = document.createElement("a"); // This is safe here
-    link.href = url;
-    link.download = "data.csv";
-    link.click();
-    
-  };
   return (
     <div>
     <Autocomplete
@@ -106,13 +85,10 @@ export default function FilterRouteAndTrip({routeOptions,tripOptions}:{routeOpti
         )}
       />
     }
-    <div>
-      {inputValueRoute}
-    </div>
-    <div>
+      <div>
         {valueRoute?.id}
-    </div>
-      {inputValueTrip}
+      </div>
+      
     </div>
   );
 }

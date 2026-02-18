@@ -1,16 +1,11 @@
 import axios from 'axios';
-import { mbtaVehicle, mbtaVehicleResponse, mbtaVehiclesPage } from '@/app/vehicles/mbtavehicle';
+import { mbtaVehicleResponse} from '@/app/vehicles/mbtavehicle';
 import { MBTARoute } from '../vehicles/mbtaroute';
 import { MBTATrip } from '../vehicles/mbtatrip';
 
 
 const USER_TOKEN = process.env.API_KEY;
 const AuthStr = `bearer ${USER_TOKEN}`;
-const instance = axios.create({
-      headers:{Authorization: AuthStr},
-      baseURL: 'https://api-v3.mbta.com',
-      timeout: 12000,
-    });
 function getOffsetFromUrl(urlString: string): number {
   try {
     const url = new URL(urlString);

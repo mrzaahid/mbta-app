@@ -1,5 +1,6 @@
 'use client';
 
+import { Console } from 'console';
 import { usePathname,useSearchParams,useRouter  } from 'next/navigation';
 import { useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
@@ -26,6 +27,7 @@ export default function Splitter({itemsPerPage}:{itemsPerPage : number}){
                 params.delete('itemsperpage')
             }
         } catch (error) {
+            console.log(error);
             setShowPopup(!showPopup);
         }
     }, 300);
