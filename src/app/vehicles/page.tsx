@@ -56,7 +56,7 @@ export default async function Page(props: {
   
   // console.log('p',response);
   return (
-    <div className="container mx-2 my-2">
+    <div className=" mx-5 my-5">
       <div className="flex w-full items-center justify-between mb-2 mt-4">
         <h1 className={`${lusitana.className} text-2xl`}>Vehicles Table</h1>
         <p>{`Current Page : ${currentPage} from ${totalPages} pages`}</p>
