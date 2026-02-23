@@ -44,4 +44,5 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out my demo in vercel https://mbta-app-psi.vercel.app/vehicles
 
+if marker in map not updating in local run you need to add .env in your local folder with api_key declared
 
