@@ -36,6 +36,7 @@ export default function Maps({ longitude, latitude, zoom }: MapProps) {
       mapRef.current?.remove();
       mapRef.current = null;
     };
+    // eslint-disable-next-line
   }, []); 
 
   useEffect(() => {

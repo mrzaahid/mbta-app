@@ -23,10 +23,9 @@ import { DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
     const vehiclesStream = new EventSource(url);
 
     for (const event of events) {
-      vehiclesStream.addEventListener(event, (e: any) => {
+      vehiclesStream.addEventListener(event, (e: MessageEvent) => {
         try {
           const rawData = JSON.parse(e.data);
-          // MBTA 'reset' returns an array, 'update' returns a single object
           const parsedData = Array.isArray(rawData) ? rawData[0] : rawData;
           
           if (parsedData) {
