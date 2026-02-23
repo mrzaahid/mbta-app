@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { mbtaVehicle } from './mbtavehicle';
 import Maps from '../ui/vehicles/maps';
 import { DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
@@ -8,11 +8,43 @@ import { DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
    }
 
    export default function Detail({ vehicleData }: DetailProps ) {
-     const [showPopup, setShowPopup] = useState(false);
-
+    const [showPopup, setShowPopup] = useState(false);
+    const [liveData, setLiveData] = useState<mbtaVehicle>(vehicleData);
      const togglePopup = () => {
        setShowPopup(!showPopup);
      };
+    useEffect(() => {
+    // Only connect if the popup is actually open
+    if (!showPopup) return;
+    const events: Array<string> = ['reset', 'add', 'update'];
+    const apiKey = process.env.NEXT_PUBLIC_MBTA_API_KEY;
+    const url = `https://api-v3.mbta.com/vehicles?filter[id]=${vehicleData.id}&api_key=${apiKey}`;
+    
+    const vehiclesStream = new EventSource(url);
+
+    for (const event of events) {
+      vehiclesStream.addEventListener(event, (e: any) => {
+        try {
+          const rawData = JSON.parse(e.data);
+          // MBTA 'reset' returns an array, 'update' returns a single object
+          const parsedData = Array.isArray(rawData) ? rawData[0] : rawData;
+          
+          if (parsedData) {
+            setLiveData(parsedData);
+          }
+        } catch (err) {
+          console.error("Error parsing stream data", err);
+        }
+      });
+    }
+
+    return () => {
+      vehiclesStream.close();
+      console.log('connection closed');
+    };
+    // FIX 2: Add dependency array so this doesn't loop forever
+  }, [showPopup, vehicleData.id]);
+        
 
      return (
         
@@ -22,9 +54,7 @@ import { DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
          </button>
          {showPopup && (
            <div className="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-
             <div className="fixed inset-0 bg-gray-500/75 transition-opacity" aria-hidden="true"></div>
-
             <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
                 <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                 
@@ -39,15 +69,15 @@ import { DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
                         <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                         <h3 className="text-base font-semibold text-gray-900" >Vehicle Detail</h3>
                         <div className="mt-2">
-                        <h2>Vehicle {vehicleData.id }</h2>
-                            <p>Vehicle Label : {vehicleData.attributes.label}</p>
-                            <p>Vehicle Status : {vehicleData.attributes.current_status}</p>
-                            <p>Vehicle Lat & Lgt : {vehicleData.attributes.latitude} & {vehicleData.attributes.longitude}</p>
-                            <p>Vehicle Last Updated : {vehicleData.attributes.updated_at}</p>
-                            <p>Vehicle Route : {vehicleData.relationships.route.data.id}</p>
-                            <p>Vehicle Trip {vehicleData.relationships.trip.data?.id}</p>
-                                {vehicleData.attributes.revenue ? (
-                                vehicleData.attributes.revenue === 'REVENUE' ? (
+                        <h2>Vehicle {liveData?.id }</h2>
+                            <p>Vehicle Label : {liveData?.attributes.label}</p>
+                            <p>Vehicle Status : {liveData?.attributes.current_status}</p>
+                            <p>Vehicle Lat & Lgt : {liveData?.attributes.latitude} & {vehicleData.attributes.longitude}</p>
+                            <p>Vehicle Last Updated : {liveData?.attributes.updated_at}</p>
+                            <p>Vehicle Route : {liveData?.relationships.route.data.id}</p>
+                            <p>Vehicle Trip {liveData?.relationships.trip.data?.id}</p>
+                                {liveData?.attributes.revenue ? (
+                                liveData?.attributes.revenue === 'REVENUE' ? (
                                     
                                     <p>This trip is accepting passengers.</p>
                                     ) : (
@@ -56,7 +86,7 @@ import { DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
                                 ):(
                                 <p>Revenue status unknown</p>
                                 )}
-                            <Maps longitude={vehicleData.attributes.longitude} latitude={vehicleData.attributes.latitude} zoom={17}/>
+                            <Maps longitude={liveData?.attributes.longitude ?? vehicleData.attributes.longitude} latitude={liveData?.attributes.latitude ?? vehicleData.attributes.latitude} zoom={16}/>
                         </div>
                         </div>
                     </div>
@@ -73,3 +103,4 @@ import { DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
        </div>
      );
    };
+   
