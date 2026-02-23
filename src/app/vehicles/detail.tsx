@@ -17,13 +17,12 @@ import { streamVehicleById} from '../lib/data';
     useEffect(() => {
       if (!showPopup) return;
       const vehiclesStream = streamVehicleById(vehicleData.id);
-      vehiclesStream.addEventListener('update', (e: any) => {
+      vehiclesStream.addEventListener('update', (e: MessageEvent) => {
         const data = JSON.parse(e.data);
         setLiveData(Array.isArray(data) ? data[0] : data);
       });
       
-      // Also listen for 'reset' and 'add' as MBTA sends these initially
-      vehiclesStream.addEventListener('reset', (e: any) => {
+      vehiclesStream.addEventListener('reset', (e: MessageEvent) => {
         const data = JSON.parse(e.data);
         setLiveData(Array.isArray(data) ? data[0] : data);
       });
