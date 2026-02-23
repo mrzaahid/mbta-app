@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { mbtaVehicle } from './mbtavehicle';
 import Maps from '../ui/vehicles/maps';
 import { DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { streamVehicleById} from '../lib/data';
    interface DetailProps {
-    vehicleData: mbtaVehicle;  // Explicitly declare vehicleData as a prop
+    vehicleData: mbtaVehicle;  
    }
 
    export default function Detail({ vehicleData }: DetailProps ) {
@@ -14,35 +15,23 @@ import { DocumentMagnifyingGlassIcon } from '@heroicons/react/24/outline';
        setShowPopup(!showPopup);
      };
     useEffect(() => {
-    // Only connect if the popup is actually open
-    if (!showPopup) return;
-    const events: Array<string> = ['reset', 'add', 'update'];
-    const apiKey = process.env.NEXT_PUBLIC_MBTA_API_KEY;
-    const url = `https://api-v3.mbta.com/vehicles?filter[id]=${vehicleData.id}&api_key=${apiKey}`;
-    
-    const vehiclesStream = new EventSource(url);
-
-    for (const event of events) {
-      vehiclesStream.addEventListener(event, (e: MessageEvent) => {
-        try {
-          const rawData = JSON.parse(e.data);
-          const parsedData = Array.isArray(rawData) ? rawData[0] : rawData;
-          
-          if (parsedData) {
-            setLiveData(parsedData);
-          }
-        } catch (err) {
-          console.error("Error parsing stream data", err);
-        }
+      if (!showPopup) return;
+      const vehiclesStream = streamVehicleById(vehicleData.id);
+      vehiclesStream.addEventListener('update', (e: any) => {
+        const data = JSON.parse(e.data);
+        setLiveData(Array.isArray(data) ? data[0] : data);
       });
-    }
+      
+      // Also listen for 'reset' and 'add' as MBTA sends these initially
+      vehiclesStream.addEventListener('reset', (e: any) => {
+        const data = JSON.parse(e.data);
+        setLiveData(Array.isArray(data) ? data[0] : data);
+      });
 
-    return () => {
-      vehiclesStream.close();
-      console.log('connection closed');
-    };
-    // FIX 2: Add dependency array so this doesn't loop forever
-  }, [showPopup, vehicleData.id]);
+      return () => {
+        vehiclesStream.close();
+      };
+    }, [showPopup, vehicleData.id]);
         
 
      return (

@@ -4,6 +4,7 @@ import { MBTARoute } from '../vehicles/mbtaroute';
 import { MBTATrip } from '../vehicles/mbtatrip';
 
 
+const NEXT_PUBLIC_USER_TOKEN = process.env.NEXT_PUBLIC_API_KEY;
 const USER_TOKEN = process.env.API_KEY;
 const AuthStr = `bearer ${USER_TOKEN}`;
 function getOffsetFromUrl(urlString: string): number {
@@ -267,6 +268,35 @@ export async function fetchTrip(route: string,date: string): Promise<MBTATrip[]>
     throw new Error('Failed to fetch Trips.');
   }
 }
+
+// In your utility file
+export function streamVehicleById(id: string): EventSource {
+  const url = `https://api-v3.mbta.com/vehicles?filter[id]=${id}&api_key=${NEXT_PUBLIC_USER_TOKEN}`;
+  return new EventSource(url);
+}
+
+// export async function streamVehicleWithHeaders(
+//   id: string, 
+//   onMessage: (data: any) => void // This is your "callback"
+// ) {
+//   const ctrl = new AbortController();
+
+//   fetchEventSource(`https://api-v3.mbta.com/vehicles?filter[id]=${id}`, {
+//     headers: {
+//       'Authorization': `bearer ${USER_TOKEN}`,
+//     },
+//     signal: ctrl.signal, // This allows us to kill the connection
+//     onmessage(ev) {
+//       if (ev.event === 'reset' || ev.event === 'add' || ev.event === 'update') {
+//         const rawData = JSON.parse(ev.data);
+//         const parsedData = Array.isArray(rawData) ? rawData[0] : rawData;
+//         onMessage(parsedData); // Send data back to the component
+//       }
+//     },
+//   });
+
+//   return ctrl; // Return this so the component can stop the stream
+// }
 
 // export async function fetchFilteredVehiclesPages(
 //   itemsPerPage:number,
